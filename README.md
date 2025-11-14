@@ -20,7 +20,7 @@ Run the following command
 ```
 This will spool up all the docker containers required to run the file. This may take a few minutes.
 
-You can access the Flask App at localhost:500 and the MLFlow UI at localhost:5001
+You can access the Flask App at localhost:5000 and the MLFlow UI at localhost:5001
 
 If you would like to train a model, run
 
