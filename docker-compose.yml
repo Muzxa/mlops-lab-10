@@ -1,0 +1,58 @@
+services:
+  # This section defines each container (service) that makes up your app
+  # Each service will work as container. 
+  mongo:
+    image: mongo:6.0 #base mongo image
+    container_name: flask_mongo_mongo # container name
+    restart: unless-stopped # tells Docker to automatically restart the Mongo container if it stop
+    environment: # Environment variables to be passed to mongo base image for authentication
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-example}
+    volumes:
+      - mongo_data:/data/db # for persistent storage. mounts a named volume (mongo_data) into /data/db inside the container
+    ports:
+      - "27017:27017" #Exposes Mongo’s default port 27017 to your host machine.
+      # mongodb://root:example@localhost:27017/
+  
+  mlflow:
+    build:
+      context: ./mlflow
+    container_name: flask_mongo_mlflow
+    restart: on-failure
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./mlflow:/mlflow
+    environment:
+      - GUNICORN_CMD_ARGS=--forwarded-allow-ips="*"
+    
+
+
+  trainer:
+    build:
+      context: ./trainer
+    container_name: flask_mongo_trainer
+    restart: no
+    depends_on:
+      - mlflow
+    volumes:
+      - ./trainer:/trainer
+
+  web:
+    build:
+      context: ./app # instead pulling image from dockerHub, build it from /app Dockerfile
+    container_name: flask_mongo_web # container name
+    restart: on-failure # will restart if failed
+    depends_on: # tell docker-compose to start mongo before this app.
+      - mongo
+      - mlflow
+    environment:
+      # Correct Mongo URI with authentication
+      MONGO_URI: mongodb://root:example@mongo:27017/flaskdb?authSource=admin
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+
+volumes:
+  mongo_data:
