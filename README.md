@@ -6,6 +6,10 @@ Clone this project into your local repository
 ```bash
   git clone https://github.com/Muzxa/mlops-lab-10.git
 ```
+Navigate to the project directory
+```bash
+    cd mlops-lab-10
+```
 Make sure the docker daemon is running in the background
 ```bash
     docker --version
@@ -14,7 +18,7 @@ Run the following command
 ```bash
     docker compose up --build
 ```
-This will spool up all the docker containers required to run the file
+This will spool up all the docker containers required to run the file. This may take a few minutes.
 
 You can access the Flask App at localhost:500 and the MLFlow UI at localhost:5001
 
